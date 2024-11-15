@@ -3,7 +3,13 @@ Rails.application.routes.draw do
   root to: "pages#home"
   resources :products
   resources :carts do
-    post 'add_product', on: :member
+    member do
+      post 'add_product', to: 'carts#add_product'
+      post 'reduce_product', to: 'carts#reduce_product'
+    end
   end
+  resources :cart_items, only: [:destroy]
   post 'cart/:id/add_product', to: 'carts#add_product', as: 'add_to_cart'
+  resources :cart_items, only: [:destroy]
+  resources :orders, only: [:new, :create]
 end

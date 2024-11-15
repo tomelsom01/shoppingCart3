@@ -8,12 +8,12 @@
       Total Price: <%= number_to_currency(line_item.total_price) %>
 
       <ul>
+         <li>
+           <%= link_to "Add one", add_product_cart_path(id: line_item), method: :post %>
+           <%= link_to "Reduce one", reduce_product_cart_path(id: line_item), method: :post %>
+         </li>
         <li>
-          <%= link_to "Add one", line_item_add_path(id: line_item), method: :post %>
-          <%= link_to "Reduce one", line_item_reduce_path(id: line_item), method: :post %>
-        </li>
-        <li>
-          <%= link_to "Remove item", line_item_path(line_item), method: :delete %>
+         
         </li>
       </ul>
     </li>
