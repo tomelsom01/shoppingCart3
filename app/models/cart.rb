@@ -1,17 +1,20 @@
 class Cart < ApplicationRecord
-  has_many :cart_items, dependent: :destroy
+  has_many :cart_items
+  has_many :products, through: :cart_items
 
   def add_product(product)
-    item = cart_items.find_by(product_id: product.id)
-    if item
-      item.quantity += 1
+    current_item = cart_items.find_by(product: product)
+    if current_item
+      current_item.quantity += 1
     else
-      item = cart_items.build(product_id: product.id, quantity: 1)
+      current_item = cart_items.build(product: product)
     end
-    item.save
+    current_item.save
   end
 
   def sub_total
-    cart_items.sum { |item| item.total_price }
+    cart_items.sum { |item| item.total_price.to_f }
   end
+
+  alias_method :total, :sub_total
 end

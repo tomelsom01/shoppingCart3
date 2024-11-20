@@ -7,8 +7,10 @@ class ApplicationController < ActionController::Base
   end
 
   def current_cart
-    @current_cart ||= Cart.find_by(id: session[:cart_id]) || Cart.create.tap do |cart|
-      session[:cart_id] = cart.id
-    end
+    Cart.find(session[:cart_id])
+  rescue ActiveRecord::RecordNotFound
+    cart = Cart.create
+    session[:cart_id] = cart.id
+    cart
   end
 end

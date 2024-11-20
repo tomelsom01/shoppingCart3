@@ -1,25 +1,25 @@
-<h2>Cart show</h2>
-<ul>
-  <% @cart.cart_items.each do |line_item| %>
-    <li>
-      Item: <%= line_item.product.name %> /
-      Price: <%= number_to_currency(line_item.product.price) %> /
-      Quantity: <%= line_item.quantity %> /
-      Total Price: <%= number_to_currency(line_item.total_price) %>
+<h1>Your Cart</h1>
 
-      <ul>
-         <li>
-           <%= link_to "Add one", add_product_cart_path(id: line_item), method: :post %>
-           <%= link_to "Reduce one", reduce_product_cart_path(id: line_item), method: :post %>
-         </li>
-        <li>
-         
-        </li>
-      </ul>
-    </li>
+<% if @cart.cart_items.empty? %>
+  <p>Your cart is empty</p>
+<% else %>
+  <% @cart.cart_items.each do |cart_item| %>
+    <div>
+      Item: <%= cart_item.product.name %> /
+      Price: <%= number_to_currency(cart_item.product.price) %> /
+      Quantity: <%= cart_item.quantity %> /
+      Total Price: <%= number_to_currency(cart_item.total_price) %>
+
+      <%= button_to 'Remove Item', cart_item_path(cart_item), method: :delete %>
+      <%= form_with(url: update_quantity_cart_item_path(cart_item), method: :post) do |f| %>
+        <%= f.number_field :quantity, value: cart_item.quantity, min: 1 %>
+        <%= f.submit 'Update Quantity' %>
+      <% end %>
+    </div>
   <% end %>
-</ul>
-<h3>Sub total: <%= number_to_currency(@cart.sub_total) %></h3>
 
-<%= link_to "Proceed to checkout", new_order_path %><br>
-<%= link_to "Empty cart", cart_path(@current_cart), method: :delete, data: { confirm: "Are you sure?" } %>
+  <h3>Sub total: <%= number_to_currency(@cart.sub_total) %></h3>
+
+  <%= button_to "Empty cart", cart_path(@cart), method: :delete, data: { confirm: "Are you sure?" } %>
+  <%= link_to "Proceed to checkout", new_order_path %>
+<% end %>
