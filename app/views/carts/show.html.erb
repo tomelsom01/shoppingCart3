@@ -5,14 +5,15 @@
 <% else %>
   <% @cart.cart_items.each do |cart_item| %>
     <div>
-      Item: <%= cart_item.product.name %> /
-      Price: <%= number_to_currency(cart_item.product.price) %> /
-      Quantity: <%= cart_item.quantity %> /
+      Item: <%= cart_item.product&.name || 'Unknown Product' %> /
+      Price: <%= number_to_currency(cart_item.product&.price || 0) %> /
+      Quantity: <%= cart_item.quantity > 0 ? cart_item.quantity : 1 %> /
       Total Price: <%= number_to_currency(cart_item.total_price) %>
 
-      <%= button_to 'Remove Item', cart_item_path(cart_item), method: :delete %>
+      <%= button_to 'Remove Item', cart_item_path(cart_item), method: :delete, data: { confirm: "Are you sure?" } %>
+
       <%= form_with(url: update_quantity_cart_item_path(cart_item), method: :post) do |f| %>
-        <%= f.number_field :quantity, value: cart_item.quantity, min: 1 %>
+        <%= f.number_field :quantity, value: cart_item.quantity, min: 1, class: 'quantity-field' %>
         <%= f.submit 'Update Quantity' %>
       <% end %>
     </div>

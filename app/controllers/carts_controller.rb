@@ -2,6 +2,7 @@ class CartsController < ApplicationController
 
   def show
     @cart = current_cart
+    puts @cart.cart_items.inspect
   end
 
   def add_product
@@ -9,7 +10,7 @@ class CartsController < ApplicationController
     product = Product.find(params[:product_id])
   @cart.add_product(product)
     redirect_to cart_path(@cart), notice: 'Product added to cart'
-  
+
   end
 
   def reduce_product
