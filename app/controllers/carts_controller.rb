@@ -29,10 +29,19 @@ class CartsController < ApplicationController
   end
 
   def destroy
-    @cart = current_cart  # This will either find or create a cart
 
-    @cart.destroy          # Safely destroy the cart.
-    session[:cart_id] = nil
-    redirect_to root_path, notice: 'Cart was successfully emptied.'
+    @cart = current_cart
+    cart_item = @cart.cart_items.find_by(id: params[:id])
+
+    if cart_item
+      puts "Found item: #{cart_item.inspect}"
+      cart_item.destroy
+      flash[:notice] = 'Item was successfully removed from your cart.'
+    else
+      puts "Item not found"
+      flash[:alert] = 'Item not found in your cart.'
+    end
+
+    redirect_to cart_path(@cart)
   end
 end

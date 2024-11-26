@@ -12,6 +12,19 @@ class CartItemsController < ApplicationController
       redirect_to cart_path(current_cart), notice: "Item removed from cart."
     end
   end
+  def destroy
+    @cart = current_cart
+    cart_item = @cart.cart_items.find_by(id: params[:id])
+
+    if cart_item
+      cart_item.destroy
+      flash[:notice] = 'Item was successfully removed from your cart.'
+    else
+      flash[:alert] = 'Item not found in your cart.'
+    end
+
+    redirect_to cart_path(@cart)
+  end
 
   private
 
