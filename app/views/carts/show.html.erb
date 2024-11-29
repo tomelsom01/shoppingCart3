@@ -22,5 +22,10 @@
   <h3>Sub total: <%= number_to_currency(@cart.sub_total) %></h3>
 
   <%= button_to "Empty cart", cart_path(@cart), method: :delete, data: { confirm: "Are you sure?" } %>
-  <%= link_to "Proceed to checkout", new_order_path %>
+  <br/>
+  <% if user_signed_in? %>
+    <%= button_to "Proceed to checkout", new_order_path %>
+  <% else %>
+    <%= button_to "Proceed to checkout", new_guest_order_path %>
+  <% end %>
 <% end %>

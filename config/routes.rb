@@ -10,12 +10,10 @@ Rails.application.routes.draw do
     end
   end
   resources :cart_items, only: [:destroy] do
-  member do
-    post 'update_quantity'
+    member do
+      post 'update_quantity'
+    end
   end
-end
-  resources :orders, only: [:new, :create]
-
-
-
+  resources :orders
+  get '/guest_order/new', to: 'orders#new_guest', as: :new_guest_order
 end
