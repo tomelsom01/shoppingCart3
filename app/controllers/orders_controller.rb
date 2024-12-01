@@ -1,11 +1,12 @@
 class OrdersController < ApplicationController
-  
+
   def index
     @orders = Order.all
   end
 
   def show
     @order = Order.find(params[:id])
+    @amount = @order.total_amount
   rescue ActiveRecord::RecordNotFound
     redirect_to root_path, alert: "Order not found"
   end
