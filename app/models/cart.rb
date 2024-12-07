@@ -1,6 +1,7 @@
 class Cart < ApplicationRecord
   has_many :cart_items
   has_many :products, through: :cart_items
+  has_one :order
 
   def add_product(product)
     current_item = cart_items.find_by(product: product)

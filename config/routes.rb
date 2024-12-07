@@ -14,7 +14,9 @@ Rails.application.routes.draw do
       post 'update_quantity'
     end
   end
-  resources :orders
+  resources :orders do
+    post 'payment', on: :member
+  end
   get '/guest_order/new', to: 'orders#new_guest', as: :new_guest_order
   post '/webhooks/stripe', to: 'webhooks#stripe'
   resources :payments, only: [:create]

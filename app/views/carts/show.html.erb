@@ -26,6 +26,6 @@
   <% if user_signed_in? %>
     <%= button_to "Proceed to checkout", new_order_path %>
   <% else %>
-    <%= button_to "Proceed to checkout", new_guest_order_path %>
+    <%= link_to "Proceed to checkout", new_guest_order_path, data: { turbo: false }, class: 'btn btn-primary' %>
   <% end %>
 <% end %>

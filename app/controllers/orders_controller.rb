@@ -1,4 +1,6 @@
 class OrdersController < ApplicationController
+  before_action :set_cart, only: [:new, :create]
+  before_action :ensure_cart_isnt_empty, only: [:new, :create]
 
   def index
     @orders = Order.all
@@ -6,10 +8,21 @@ class OrdersController < ApplicationController
 
   def show
     @order = Order.find(params[:id])
-    @amount = @order.total_amount
+  @amount = @order.total_price
+
+  if @amount && @amount > 0
+    @payment_intent = Stripe::PaymentIntent.create({
+      amount: (@amount * 100).to_i,
+      currency: 'usd',
+    })
+  else
+    flash.now[:alert] = "Unable to process payment for this order."
+    render :show
+  end
   rescue ActiveRecord::RecordNotFound
     redirect_to root_path, alert: "Order not found"
   end
+
 
   def new
     @order = Order.new
@@ -21,12 +34,13 @@ class OrdersController < ApplicationController
 
   def create
     @order = Order.new(order_params)
-    @order.cart = @cart  # Use @cart instead of current_cart
+    @order.cart = @cart
 
     if @order.save
       session[:cart_id] = nil
-      redirect_to root_path, notice: "Order placed successfully."
+      redirect_to order_path(@order), notice: "Order placed successfully. Please proceed with payment."
     else
+      flash.now[:alert] = "There was an error creating your order."
       render :new
     end
   end
