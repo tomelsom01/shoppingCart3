@@ -3,6 +3,7 @@ class Order < ApplicationRecord
   validates :name, presence: true
   validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :address, presence: true
+  validates :total_price, presence: true
 
   def total_price
     # Calculate the total price based on order items

@@ -1,7 +1,7 @@
 class PaymentsController < ApplicationController
   def create
     @order = Order.find(params[:order_id])
-    @amount = @order.total_amount
+    @amount = @order.total_price.to_f  # Convert to float
 
     customer = Stripe::Customer.create(
       email: params[:stripeEmail],
@@ -10,12 +10,12 @@ class PaymentsController < ApplicationController
 
     charge = Stripe::Charge.create(
       customer: customer.id,
-      amount: @amount.to_i * 100,  # Stripe expects amount in cents
+      amount: (@amount * 100).to_i,  # Convert to cents and then to integer
       description: "Payment for Order ##{@order.id}",
       currency: 'usd'
     )
 
-    @order.update(paid: true)
+    @order.update(status: 'paid')  # Update status instead of 'paid' boolean
     redirect_to order_path(@order), notice: 'Payment successful!'
 
   rescue Stripe::CardError => e
