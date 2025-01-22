@@ -6,7 +6,6 @@ class Order < ApplicationRecord
   validates :total_price, presence: true
 
   def total_price
-    # Calculate the total price based on order items
-    cart.cart_items.sum { |item| item.quantity * item.product.price }
+    cart.cart_items.sum { |item| item.product.price * item.quantity }
   end
 end

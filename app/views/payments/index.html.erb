@@ -1,0 +1,30 @@
+<h1>Your Purchases</h1>
+
+<% if flash[:notice] %>
+  <div class="alert alert-success"><%= flash[:notice] %></div>
+<% end %>
+
+<% if @purchases.present? %>
+  <table>
+    <thead>
+      <tr>
+        <th>Order ID</th>
+        <th>Date</th>
+        <th>Amount</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @purchases.each do |purchase| %>
+        <tr>
+          <td><%= purchase.id %></td>
+          <td><%= purchase.created_at.strftime("%B %d, %Y") %></td>
+          <td>$<%= purchase.amount %></td>
+          <td><%= purchase.status %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p>You haven't made any purchases yet.</p>
+<% end %>

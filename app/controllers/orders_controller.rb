@@ -23,7 +23,11 @@ class OrdersController < ApplicationController
     redirect_to root_path, alert: "Order not found"
   end
 
-
+  def payment
+    @order = Order.find(params[:id])
+    redirect_to payments_path(order_id: @order.id), method: :post
+  end
+  
   def new
     @order = Order.new
   end
