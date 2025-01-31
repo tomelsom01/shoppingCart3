@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::Base
   helper_method :current_cart
   before_action :set_default_cart
+  
 
   def set_default_cart
     session[:cart_id] ||= Cart.first&.id  # Use safe navigation to avoid NoMethodError

@@ -1,33 +1,36 @@
 class OrdersController < ApplicationController
   before_action :set_cart, only: [:new, :create]
   before_action :ensure_cart_isnt_empty, only: [:new, :create]
+  before_action :set_order, only: [:show, :payment]
 
   def index
     @orders = Order.all
   end
 
   def show
-    @order = Order.find(params[:id])
-  @amount = @order.total_price
+    @amount = @order.calculate_total_price
 
-  if @amount && @amount > 0
-    @payment_intent = Stripe::PaymentIntent.create({
-      amount: (@amount * 100).to_i,
-      currency: 'usd',
-    })
-  else
-    flash.now[:alert] = "Unable to process payment for this order."
-    render :show
+    if @amount && @amount > 0
+      @payment_intent = create_payment_intent(@amount)
+    else
+      flash.now[:alert] = "Unable to process payment for this order."
+      render :show
+    end
+  rescue StandardError => e
+    handle_error(e)
   end
-  rescue ActiveRecord::RecordNotFound
-    redirect_to root_path, alert: "Order not found"
+
+  def payment
+    redirect_to payments_path(order_id: @order.id), method: :post
+  rescue StandardError => e
+    handle_error(e)
   end
 
   def payment
     @order = Order.find(params[:id])
     redirect_to payments_path(order_id: @order.id), method: :post
   end
-  
+
   def new
     @order = Order.new
   end
@@ -41,7 +44,7 @@ class OrdersController < ApplicationController
     @order.cart = @cart
 
     if @order.save
-      session[:cart_id] = nil
+      clear_cart_session
       redirect_to order_path(@order), notice: "Order placed successfully. Please proceed with payment."
     else
       flash.now[:alert] = "There was an error creating your order."
@@ -66,5 +69,27 @@ class OrdersController < ApplicationController
   rescue ActiveRecord::RecordNotFound
     @cart = Cart.create
     session[:cart_id] = @cart.id
+  end
+  
+  def set_order
+    @order = Order.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    redirect_to root_path, alert: "Order not found"
+  end
+
+  def create_payment_intent(amount)
+    Stripe::PaymentIntent.create({
+      amount: (amount * 100).to_i,
+      currency: 'usd',
+    })
+  end
+
+  def clear_cart_session
+    session[:cart_id] = nil
+  end
+
+  def handle_error(error)
+    Rails.logger.error "Error: #{error.message}"
+    redirect_to root_path, alert: "An error occurred. Please try again later."
   end
 end
