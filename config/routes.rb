@@ -20,5 +20,7 @@ Rails.application.routes.draw do
   get '/guest_order/new', to: 'orders#new_guest', as: :new_guest_order
   post '/webhooks/stripe', to: 'webhooks#stripe'
   resources :payments, only: [:create, :index]
+  post '/orders/new', to: 'orders#new'
+
 
 end

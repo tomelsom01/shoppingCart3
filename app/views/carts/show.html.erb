@@ -24,7 +24,7 @@
   <%= button_to "Empty cart", cart_path(@cart), method: :delete, data: { confirm: "Are you sure?" } %>
   <br/>
   <% if user_signed_in? %>
-    <%= button_to "Proceed to checkout", new_order_path %>
+    <%= button_to "Proceed to checkout", new_order_path, data: { turbo: false }, class: 'btn btn-primary' %>
   <% else %>
     <%= link_to "Proceed to checkout", new_guest_order_path, data: { turbo: false }, class: 'btn btn-primary' %>
   <% end %>

@@ -2,6 +2,7 @@ class OrdersController < ApplicationController
   before_action :set_cart, only: [:new, :create]
   before_action :ensure_cart_isnt_empty, only: [:new, :create]
   before_action :set_order, only: [:show, :payment]
+  before_action :set_order_for_guest_or_user, only: [:new, :create, :payment]
 
   def index
     @orders = Order.all
@@ -32,6 +33,7 @@ class OrdersController < ApplicationController
   end
 
   def new
+    Rails.logger.debug "Params: #{params.inspect}"
     @order = Order.new
   end
 
@@ -40,7 +42,11 @@ class OrdersController < ApplicationController
   end
 
   def create
-    @order = Order.new(order_params)
+    @order = if user_signed_in?
+      current_user.orders.build(cart: @cart)
+    else
+      Order.new(cart: @cart) # Guest order
+    end
     @order.cart = @cart
 
     if @order.save
@@ -70,7 +76,7 @@ class OrdersController < ApplicationController
     @cart = Cart.create
     session[:cart_id] = @cart.id
   end
-  
+
   def set_order
     @order = Order.find(params[:id])
   rescue ActiveRecord::RecordNotFound
@@ -92,4 +98,13 @@ class OrdersController < ApplicationController
     Rails.logger.error "Error: #{error.message}"
     redirect_to root_path, alert: "An error occurred. Please try again later."
   end
+  def set_order_for_guest_or_user
+    if user_signed_in?
+      @order = params[:action] == 'create' ? current_user.orders.build(order_params) : current_user.orders.build
+    else
+      @order = params[:action] == 'create' ? Order.new(order_params) : Order.new
+      session[:guest_order] = @order.attributes if params[:action] == 'create' # Only store attributes for guests during creation.
+    end
+  end
+
 end
