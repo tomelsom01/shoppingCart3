@@ -1,6 +1,6 @@
 class Order < ApplicationRecord
   belongs_to :cart
-  belongs_to :user
+  belongs_to :user, optional: true
   has_many :cart_items, through: :cart
   has_many :products, through: :cart_items
 

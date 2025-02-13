@@ -42,18 +42,14 @@ class OrdersController < ApplicationController
   end
 
   def create
-    @order = if user_signed_in?
-      current_user.orders.build(cart: @cart)
-    else
-      Order.new(cart: @cart) # Guest order
-    end
+    @order = set_order_for_guest_or_user
     @order.cart = @cart
 
     if @order.save
       clear_cart_session
       redirect_to order_path(@order), notice: "Order placed successfully. Please proceed with payment."
     else
-      flash.now[:alert] = "There was an error creating your order."
+      flash.now[:alert] = "There was an error creating your order: #{@order.errors.full_messages.join(', ')}"
       render :new
     end
   end
@@ -103,8 +99,9 @@ class OrdersController < ApplicationController
       @order = params[:action] == 'create' ? current_user.orders.build(order_params) : current_user.orders.build
     else
       @order = params[:action] == 'create' ? Order.new(order_params) : Order.new
-      session[:guest_order] = @order.attributes if params[:action] == 'create' # Only store attributes for guests during creation.
     end
   end
+
+
 
 end
