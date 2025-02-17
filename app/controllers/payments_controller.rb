@@ -1,8 +1,10 @@
 class PaymentsController < ApplicationController
   skip_before_action :authenticate_user!, only: [:create], raise: false
+
   def index
     @purchases = current_user&.purchases
   end
+
   def create
     Rails.logger.info "PaymentsController#create action hit"
     @order = Order.find_by(id: params[:order_id])
@@ -26,7 +28,9 @@ class PaymentsController < ApplicationController
       )
 
       @order.update(status: 'paid')
-      redirect_to payments_path(order_id: @order.id), notice: 'Payment successful!'
+
+      # Redirect to the payments index page after successful payment
+      redirect_to payments_path, notice: 'Payment successful!'
     rescue Stripe::CardError => e
       flash[:error] = e.message
       redirect_to order_path(@order)
