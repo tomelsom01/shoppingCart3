@@ -3,6 +3,7 @@ class Order < ApplicationRecord
   belongs_to :user, optional: true
   has_many :cart_items, through: :cart
   has_many :products, through: :cart_items
+  attr_accessor :stripe_token 
 
   validates :name, presence: true
   validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP }

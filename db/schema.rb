@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_02_17_134655) do
+ActiveRecord::Schema[7.0].define(version: 2025_02_17_145104) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -39,6 +39,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_02_17_134655) do
     t.bigint "cart_id", null: false
     t.string "payment_intent_id"
     t.bigint "user_id"
+    t.string "payment_status"
     t.index ["cart_id"], name: "index_orders_on_cart_id"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
@@ -60,6 +61,9 @@ ActiveRecord::Schema[7.0].define(version: 2025_02_17_134655) do
     t.datetime "remember_created_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "stripe_customer_id"
+    t.boolean "paid", default: false
+    t.string "card_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end

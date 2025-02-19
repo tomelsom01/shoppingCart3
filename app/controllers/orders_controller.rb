@@ -2,7 +2,7 @@ class OrdersController < ApplicationController
   before_action :set_cart, only: [:new, :create]
   before_action :ensure_cart_isnt_empty, only: [:new, :create]
   before_action :set_order, only: [:show, :payment]
-  before_action :set_order_for_guest_or_user, only: [:new, :create, :payment]
+  before_action :set_order_for_guest_or_user, only: [:new, :create]
 
   def index
     @orders = Order.all
@@ -27,11 +27,6 @@ class OrdersController < ApplicationController
     handle_error(e)
   end
 
-  def payment
-    @order = Order.find(params[:id])
-    redirect_to payments_path(order_id: @order.id), method: :post
-  end
-
   def new
     Rails.logger.debug "Params: #{params.inspect}"
     @order = Order.new
@@ -46,6 +41,7 @@ class OrdersController < ApplicationController
     @order.cart = @cart
 
     if @order.save
+      process_payment
       clear_cart_session
       redirect_to order_path(@order), notice: "Order placed successfully. Please proceed with payment."
     else
@@ -102,6 +98,15 @@ class OrdersController < ApplicationController
     end
   end
 
+  def process_payment
+    # Here you would typically use the Stripe token to create a charge or payment intent
+    # This is just a placeholder - implement your actual payment logic here
+    if params[:stripeToken]
+      # Process payment using Stripe
+      # You might want to add the charge ID or payment intent ID to the order
+      @order.update(payment_status: 'paid')
+    end
+  end
 
 
 end
