@@ -6,7 +6,6 @@ class PaymentsController < ApplicationController
   end
 
   def create
-    Rails.logger.info "PaymentsController#create action hit"
     @order = Order.find_by(id: params[:order_id])
     unless @order
       return redirect_to root_path, alert: "Order not found"
@@ -28,8 +27,6 @@ class PaymentsController < ApplicationController
       )
 
       @order.update(status: 'paid')
-
-      # Redirect to the payments index page after successful payment
       redirect_to payments_path, notice: 'Payment successful!'
     rescue Stripe::CardError => e
       flash[:error] = e.message
@@ -41,5 +38,6 @@ class PaymentsController < ApplicationController
       flash[:error] = "An unexpected error occurred. Please try again."
       redirect_to order_path(@order)
     end
+  end
   end
 end

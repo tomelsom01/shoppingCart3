@@ -37,29 +37,29 @@ class OrdersController < ApplicationController
   end
 
   def create
-    @order = set_order_for_guest_or_user
-    @order.cart = @cart
+    @order = Order.find(params[:order_id])
+    token = params[:stripeToken]
 
-    if @order.save
-      process_payment
-      clear_cart_session
-      redirect_to order_path(@order), notice: "Order placed successfully. Please proceed with payment."
+    # Create the charge in Stripe
+    charge = Stripe::Charge.create({
+      amount: (@order.total_price * 100).to_i,
+      currency: 'usd',
+      source: token,
+      description: "Charge for Order ##{@order.id}"
+    })
+
+    # If the charge is successful, save the token to the order
+    if charge.paid
+      @order.update(stripe_token: token, status: 'paid')
+      redirect_to order_path(@order), notice: 'Payment successful!'
     else
-      flash.now[:alert] = "There was an error creating your order: #{@order.errors.full_messages.join(', ')}"
-      render :new
+      redirect_to order_path(@order), alert: 'Payment failed.'
     end
+
+  rescue Stripe::CardError => e
+    redirect_to order_path(@order), alert: e.message
   end
 
-  private
-
-  def order_params
-    params.require(:order).permit(:name, :email, :address, :pay_type)
-  end
-
-  def ensure_cart_isnt_empty
-    if @cart.cart_items.empty?
-      redirect_to root_path, alert: "Your cart is empty"
-    end
   end
 
   def set_cart

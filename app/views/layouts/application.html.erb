@@ -3,6 +3,8 @@
   <head>
     <title>ShoppingCart3</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="stripe-publishable-key" content="<%= Rails.configuration.stripe[:publishable_key] %>">
+
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 

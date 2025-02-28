@@ -1,15 +1,8 @@
 <h1>Order #<%= @order.id %></h1>
 
-<%= form_tag payments_path(order_id: @order.id) do %>
-  <article>
-    <label class="amount">
-      <span>Amount: $<%= @amount %></span>
-    </label>
-  </article>
+<form id="payment-form" data-controller="stripe">
+  <div id="card-element"></div>
+  <button id="submit-button">Pay $<%= @amount %></button>
+</form>
 
-  <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-          data-key="<%= Rails.configuration.stripe[:publishable_key] %>"
-          data-description="Order #<%= @order.id %>"
-          data-amount="<%= @amount.to_i * 100 %>"
-          data-locale="auto"></script>
-<% end %>
+<script src="https://js.stripe.com/v3/"></script>
